@@ -95,6 +95,7 @@
 
 @property BOOL sourcePaneLineNumbersAreVisible;
 
+@property BOOL sourcePaneShowsSyntaxHighlighting;
 
 /* Actions to support properties from Menus */
 - (IBAction)toggleOptionsPanelIsVisible:(id)sender;

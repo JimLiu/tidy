@@ -69,13 +69,12 @@
 #import "EncodingHelperController.h"
 #import "FirstRunController.h"
 #import "JSDTableViewController.h"
-#import "JSDTextView.h"
-#import "NSTextView+JSDExtensions.h"
+#import "MGSFragariaView.h"
 #import "OptionPaneController.h"
-#import "TidyDocument.h"
 #import "TidyDocumentSourceViewController.h"
 
 #import "JSDTidyModel.h"
+#import "JSDTidyOption.h"
 
 
 @implementation TidyDocumentWindowController
@@ -86,6 +85,7 @@
 
 
 @synthesize sourcePaneLineNumbersAreVisible = _sourcePaneLineNumbersAreVisible;
+@synthesize sourcePaneShowsSyntaxHighlighting = _sourcePaneShowsSyntaxHighlighting;
 
 #pragma mark - Initialization and Deallocation
 
@@ -113,8 +113,13 @@
 {
 	TidyDocument *localDocument = self.document;
 
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:tidyNotifyOptionChanged object:self.optionController.tidyDocument];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:tidyNotifyPossibleInputEncodingProblem object:localDocument.tidyProcess];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+	                                                name:tidyNotifyOptionChanged
+		                                          object:self.optionController.tidyDocument];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+	                                                name:tidyNotifyPossibleInputEncodingProblem
+		                                          object:localDocument.tidyProcess];
 
 	[self.messagesController.arrayController removeObserver:self forKeyPath:@"selection"];
 }
@@ -168,8 +173,10 @@
 
 	self.sourcePanelIsVertical  = [[[NSUserDefaults standardUserDefaults] objectForKey:JSDKeyShowNewDocumentSideBySide] boolValue];
 	self.sourcePaneLineNumbersAreVisible = [[[NSUserDefaults standardUserDefaults] valueForKey:JSDKeyShowNewDocumentLineNumbers] boolValue];
+	self.sourcePaneShowsSyntaxHighlighting = [[[NSUserDefaults standardUserDefaults] valueForKey:JSDKeyShowNewDocumentHighlighting] boolValue];
 
-	
+
+
 	/******************************************************
 		Remaining initial document conditions.
 	 ******************************************************/
@@ -269,7 +276,13 @@
  *———————————————————————————————————————————————————————————————————*/
 - (void)handleTidyOptionChange:(NSNotification *)note
 {
-	[((TidyDocument*)self.document).tidyProcess optionsCopyValuesFromModel:self.optionController.tidyDocument];
+    TidyDocument *localDocument = self.document;
+
+	[localDocument.tidyProcess optionsCopyValuesFromModel:self.optionController.tidyDocument];
+
+    JSDTidyOption *localOption = localDocument.tidyProcess.tidyOptions[@"wrap"];
+
+    self.sourceController.pageGuidePosition = [[localOption optionValue] integerValue];
 }
 
 
@@ -319,7 +332,7 @@
 
 	if ((object == self.messagesController.arrayController) && ([keyPath isEqualToString:@"selection"]))
 	{
-		[self.sourceController highlightSourceTextUsingArrayController:self.messagesController.arrayController];
+		[self.sourceController centerSourceTextErrorUsingArrayController:self.messagesController.arrayController];
 	}
 }
 
@@ -329,7 +342,7 @@
 
 /*———————————————————————————————————————————————————————————————————*
 	splitView:canCollapseSubview
-		Supports hiding the tidy options and/or messsages panels.
+		Supports hiding the tidy options and/or messages panels.
 		Although we're handing this programmatically, this delegate
 		method is still required if we want it to work.
  *———————————————————————————————————————————————————————————————————*/
@@ -390,6 +403,12 @@
 	if (menuItem.action == @selector(toggleSourcePaneShowsLineNumbers:))
 	{
 		[menuItem setState:self.sourcePaneLineNumbersAreVisible];
+		return YES;
+	}
+
+	if (menuItem.action == @selector(toggleSourcePaneShowsSyntaxHighlighting:))
+	{
+		[menuItem setState:self.sourcePaneShowsSyntaxHighlighting];
 		return YES;
 	}
 
@@ -533,7 +552,7 @@
 
 	/* In case something is selected in the messages table, highlight it again. */
 
-	[self.sourceController highlightSourceTextUsingArrayController:self.messagesController.arrayController];
+	[self.sourceController centerSourceTextErrorUsingArrayController:self.messagesController.arrayController];
 }
 
 /*———————————————————————————————————————————————————————————————————*
@@ -549,6 +568,21 @@
 	self.sourceController.sourceTextView.showsLineNumbers = sourcePaneLineNumbersAreVisible;
 	self.sourceController.tidyTextView.showsLineNumbers = sourcePaneLineNumbersAreVisible;
 	_sourcePaneLineNumbersAreVisible = sourcePaneLineNumbersAreVisible;
+}
+
+/*———————————————————————————————————————————————————————————————————*
+	sourcePaneShowsSyntaxHighlighting
+ *———————————————————————————————————————————————————————————————————*/
+- (BOOL)sourcePaneShowsSyntaxHighlighting
+{
+	return _sourcePaneShowsSyntaxHighlighting;
+}
+
+- (void)setSourcePaneShowsSyntaxHighlighting:(BOOL)sourcePaneShowsSyntaxHighlighting
+{
+	self.sourceController.sourceTextView.syntaxColoured = sourcePaneShowsSyntaxHighlighting;
+	self.sourceController.tidyTextView.syntaxColoured = sourcePaneShowsSyntaxHighlighting;
+	_sourcePaneShowsSyntaxHighlighting = sourcePaneShowsSyntaxHighlighting;
 }
 
 
@@ -572,9 +606,16 @@
 	self.sourcePanelIsVertical = !self.sourcePanelIsVertical;
 }
 
+
 - (IBAction)toggleSourcePaneShowsLineNumbers:(id)sender
 {
 	self.sourcePaneLineNumbersAreVisible = !self.sourcePaneLineNumbersAreVisible;
+}
+
+
+- (IBAction)toggleSourcePaneShowsSyntaxHighlighting:(id)sender
+{
+	self.sourcePaneShowsSyntaxHighlighting = !self.sourcePaneShowsSyntaxHighlighting;
 }
 
 

@@ -39,6 +39,12 @@
 #pragma mark - IMPLEMENTATION
 
 
+@interface JSDTidyModel ()
+
+@property (readwrite) NSString *tidyText;
+
+@end
+
 @implementation JSDTidyModel
 {
 	NSMutableDictionary *_tidyOptions;         // This backing iVar must be NSMutableDictionary (can't @synthesize)
@@ -570,6 +576,11 @@ BOOL tidyCallbackFilter2 ( TidyDoc tdoc, TidyReportLevel lvl, uint line, uint co
 	tidyText
 		Return the tidy'd text.
  *–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
+- (void)setTidyText:(NSString *)tidyText
+{
+	// Do nothing; this is just a sink for KVO setters.
+}
+
 - (NSString *)tidyText
 {
 //	__block NSString *localTidyText;

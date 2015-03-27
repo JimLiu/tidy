@@ -29,14 +29,16 @@
 
 @import Cocoa;
 
-@class JSDTextView;
+#import "MGSDragOperationDelegate.h" // can't use module because of delegate support.
+
+@class MGSFragariaView;
 
 
-@interface TidyDocumentSourceViewController : NSViewController <NSTextViewDelegate>
+@interface TidyDocumentSourceViewController : NSViewController <NSTextViewDelegate, MGSDragOperationDelegate>
 
-@property (assign) IBOutlet JSDTextView *sourceTextView;
+@property (assign) IBOutlet MGSFragariaView *sourceTextView;
 
-@property (assign) IBOutlet NSTextView *tidyTextView;
+@property (assign) IBOutlet MGSFragariaView *tidyTextView;
 
 @property (assign) IBOutlet NSSplitView *splitterViews;
 
@@ -51,12 +53,14 @@
 
 @property (assign) BOOL viewsAreDiffed;
 
+@property (assign) NSUInteger pageGuidePosition;
+
 
 - (instancetype)initVertical:(BOOL)initVertical;
 
 - (void)setupViewAppearance;
 
-- (void)highlightSourceTextUsingArrayController:(NSArrayController*)arrayController;
+- (void)centerSourceTextErrorUsingArrayController:(NSArrayController*)arrayController;
 
 
 /* 

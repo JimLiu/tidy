@@ -146,6 +146,16 @@ ul
 	margin-left: 2em;
 }
 
+ol
+{
+	margin-left: 2em;
+
+	ol
+	{
+		list-style-type: lower-alpha;
+	}
+}
+
 
 //	"standard" li only spaces the items. Set the <ul> or <ol>
 //	in a styling container if you want padding or margins.

@@ -2593,6 +2593,13 @@ ul {
   margin-left: 2em;
 }
 
+ol {
+  margin-left: 2em;
+}
+ol ol {
+  list-style-type: lower-alpha;
+}
+
 li {
   margin: 0.8ex 0 0.8ex 0;
 }

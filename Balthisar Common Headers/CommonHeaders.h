@@ -56,6 +56,7 @@
 
 	/* Document - Appearance */
 
+	#define JSDKeyShowNewDocumentHighlighting     @"ShowNewDocumentHighlighting"
 	#define JSDKeyShowNewDocumentLineNumbers      @"ShowNewDocumentLineNumbers"
 	#define JSDKeyShowNewDocumentMessages         @"ShowNewDocumentMessages"
 	#define JSDKeyShowNewDocumentTidyOptions      @"ShowNewDocumentTidyOptions"

@@ -35,8 +35,6 @@
 #import "JSDTidyModel.h"
 #import "JSDTidyOption.h"
 
-#import "JSDTableCellView.h"
-
 
 #pragma mark - CATEGORY - Non-Public
 
@@ -92,6 +90,9 @@
 
 
 @implementation OptionPaneController
+{
+	BOOL awokeFromNib;
+};
 
 
 #pragma mark - Initialization and Deallocation
@@ -115,6 +116,8 @@
 		self.isShowingOptionsInGroups = [[NSUserDefaults standardUserDefaults] boolForKey:JSDKeyOptionsAreGrouped];
 
 		self.isInPreferencesView = NO;
+
+		awokeFromNib = NO;
 	}
 
 	return self;
@@ -125,11 +128,10 @@
 	awakeFromNib
 		Set up the description label's constraint.
 		Ensure view occupies entire parent container.
-	@TODO: called multiple times because of view based tables.
  *–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
 - (void)awakeFromNib
 {
-	if (!self.theDescriptionConstraint)
+	if (!self.theDescriptionConstraint && !awokeFromNib)
 	{
 		self.theDescriptionConstraint = [NSLayoutConstraint constraintWithItem:self.theDescription
 																	 attribute:NSLayoutAttributeHeight

@@ -32,7 +32,8 @@
 
 #import "TidyDocumentWindowController.h"
 #import "TidyDocumentSourceViewController.h"
-#import "JSDTextView.h"
+#import "MGSFragariaView.h"
+#import "SMLTextView.h"
 
 #import "JSDTidyModel.h"
 
@@ -244,7 +245,8 @@
 	[self.printInfo setTopMargin:36];
 	[self.printInfo setBottomMargin:36];
 
-	return [NSPrintOperation printOperationWithView:self.windowController.sourceController.tidyTextView printInfo:self.printInfo];
+	NSTextView *theView = self.windowController.sourceController.tidyTextView.textView;
+	return [NSPrintOperation printOperationWithView:theView printInfo:self.printInfo];
 }
 
 
